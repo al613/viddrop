@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>VidDrop — تحميل الفيديوهات بسهولة</title>
+  <meta name="description" content="حمّل الفيديوهات بسهولة من المنصات المدعومة بجودات مختلفة." />
+
+  <style>
+    :root {
+      --bg: #0b0c0f;
+      --card: #111318;
+      --card-2: #181b22;
+      --border: #2b3040;
+      --text: #eef1f7;
+      --muted: #9aa3b5;
+      --faint: #5f687a;
+      --accent: #5b6ef5;
+      --accent-2: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 24px 70px rgba(0,0,0,.38);
+      --radius: 24px;
+    }
+
+    body.light {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --card-2: #f0f3f9;
+      --border: #dce2ee;
+      --text: #101623;
+      --muted: #5d6678;
+      --faint: #8a93a5;
+      --shadow: 0 24px 70px rgba(25,35,60,.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(91,110,245,.18), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(139,92,246,.14), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    .page {
+      width: min(980px, calc(100% - 32px));
+      margin: auto;
+      padding: 28px 0 70px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 52px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 34px rgba(91,110,245,.35);
+    }
+
+    .theme-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 11px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .theme-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      background: rgba(91,110,245,.12);
+      border: 1px solid rgba(91,110,245,.25);
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 72px);
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+      font-weight: 950;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      max-width: 640px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.9;
+    }
+
+    .search-card {
+      background: rgba(255,255,255,.035);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      margin-bottom: 22px;
+    }
+
+    body.light .search-card {
+      background: rgba(255,255,255,.8);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 10px 16px 10px 10px;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 5px rgba(91,110,245,.18);
+    }
+
+    .search-icon {
+      color: var(--faint);
+      flex: 0 0 auto;
+    }
+
+    #urlInput {
+      flex: 1;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 16px;
+      direction: ltr;
+      text-align: left;
+      min-width: 0;
+    }
+
+    #urlInput::placeholder {
+      color: var(--faint);
+    }
+
+    .btn-main {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 24px;
+      cursor: pointer;
+      color: white;
+      font-weight: 900;
+      font-size: 15px;
+      white-space: nowrap;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 32px rgba(91,110,245,.32);
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-1px);
+      opacity: .94;
+    }
+
+    .btn-main:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hint-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--muted);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      direction: ltr;
+    }
+
+    .error {
+      display: none;
+      margin-top: 16px;
+      background: rgba(239,68,68,.1);
+      color: #ffb4b4;
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-weight: 700;
+    }
+
+    body.light .error {
+      color: #b91c1c;
+    }
+
+    .loading {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .skeleton {
+      height: 18px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, var(--card-2), rgba(91,110,245,.18), var(--card-2));
+      background-size: 700px 100%;
+      animation: shimmer 1.4s linear infinite;
+    }
+
+    .skeleton.big {
+      height: 130px;
+      border-radius: 20px;
+    }
+
+    @keyframes shimmer {
+      from { background-position: -700px 0; }
+      to { background-position: 700px 0; }
+    }
+
+    .results {
+      display: none;
+      margin-top: 24px;
+    }
+
+    .results.active {
+      display: block;
+      animation: rise .3s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .video-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .video-head {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+    }
+
+    .thumb {
+      min-height: 150px;
+      background: var(--card-2);
+      overflow: hidden;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      min-height: 150px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .info {
+      padding: 22px;
+    }
+
+    .title {
+      font-size: 20px;
+      line-height: 1.55;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .stat {
+      background: var(--card-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .simple-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title h2 {
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .easy-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .easy-card {
+      border: 1.5px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      border-radius: 22px;
+      padding: 18px;
+      cursor: pointer;
+      text-align: right;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .easy-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    .easy-card.recommended {
+      background: linear-gradient(135deg, rgba(91,110,245,.22), rgba(139,92,246,.15));
+      border-color: rgba(91,110,245,.55);
+    }
+
+    .easy-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .easy-card h3 {
+      font-size: 20px;
+      margin-bottom: 6px;
+      font-weight: 950;
+    }
+
+    .easy-card p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .easy-card .mini {
+      margin-top: 12px;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .advanced {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .advanced-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .advanced-header h2 {
+      font-size: 18px;
+      font-weight: 950;
+    }
+
+    .formats {
+      padding: 8px;
+    }
+
+    .format-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      transition: background .2s ease;
+    }
+
+    .format-row:hover {
+      background: var(--card-2);
+    }
+
+    .format-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(91,110,245,.14);
+      flex: 0 0 auto;
+      font-size: 19px;
+    }
+
+    .format-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .format-name {
+      font-weight: 900;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 900;
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--card);
+      direction: ltr;
+    }
+
+    .badge.video {
+      color: #91a0ff;
+      border-color: rgba(91,110,245,.35);
+      background: rgba(91,110,245,.12);
+    }
+
+    .badge.audio {
+      color: #ffc46b;
+      border-color: rgba(245,158,11,.35);
+      background: rgba(245,158,11,.12);
+    }
+
+    .format-meta {
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      direction: ltr;
+      justify-content: flex-end;
+    }
+
+    .btn-download {
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease, border-color .2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-download:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 12px 20px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      z-index: 20;
+      font-weight: 800;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .footer {
+      margin-top: 36px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 13px;
+    }
+
+    .footer strong {
+      color: var(--text);
+    }
+
+    @media (max-width: 760px) {
+      .video-head {
+        grid-template-columns: 1fr;
+      }
+
+      .easy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-box {
+        flex-wrap: wrap;
+      }
+
+      #urlInput {
+        width: 100%;
+        flex-basis: 100%;
+      }
+
+      .btn-main {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: min(100% - 20px, 980px);
+      }
+
+      .nav {
+        flex-direction: column;
+      }
+
+      .hero {
+        margin-bottom: 22px;
+      }
+
+      .hero h1 {
+        font-size: 38px;
+      }
+
+      .format-row {
+        flex-wrap: wrap;
+      }
+
+      .btn-download {
+        width: 100%;
+      }
+
+      .section-title,
+      .advanced-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <nav class="nav">
+      <a href="/" class="logo">
+        <div class="logo-icon">🎬</div>
+        <span>VidDrop</span>
+      </a>
+
+      <button id="themeBtn" class="theme-btn" type="button">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">الوضع الليلي</span>
+      </button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-badge">⚡ تحميل بسيط وواضح للجميع</div>
+
+      <h1>
+        حمّل الفيديو<br />
+        <span>بدون تعقيد</span>
+      </h1>
+
+      <p>
+        الصق رابط الفيديو، وسنقترح لك أزرار واضحة:
+        أعلى جودة، جودة متوسطة، أو أقل جودة. مناسب لأي شخص يريد التحميل بسرعة وبدون تفاصيل كثيرة.
+      </p>
+    </section>
+
+    <section class="search-card">
+      <div class="search-box">
+        <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+
+        <input
+          id="urlInput"
+          type="url"
+          placeholder="ضع رابط الفيديو هنا..."
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="رابط الفيديو"
+        />
+
+        <button id="analyzeBtn" class="btn-main" type="button">
+          عرض التحميل
+        </button>
+      </div>
+
+      <div class="hint-row">
+        <span>يدعم:</span>
+        <span class="pill">YouTube</span>
+        <span class="pill">TikTok</span>
+        <span class="pill">Twitter / X</span>
+        <span class="pill">Reddit</span>
+        <span class="pill">Vimeo</span>
+      </div>
+
+      <div id="errorBox" class="error"></div>
+    </section>
+
+    <div id="loadingBox" class="loading">
+      <div class="skeleton big"></div>
+      <div class="skeleton" style="width:80%"></div>
+      <div class="skeleton" style="width:60%"></div>
+      <div class="skeleton" style="width:45%"></div>
+    </div>
+
+    <main id="results" class="results">
+      <section class="video-card">
+        <div class="video-head">
+          <div class="thumb">
+            <img id="videoThumb" src="" alt="صورة الفيديو" />
+          </div>
+
+          <div class="info">
+            <div id="videoTitle" class="title">—</div>
+            <div id="videoStats" class="stats"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="simple-box">
+        <div class="section-title">
+          <div>
+            <h2>تحميل سريع وبسيط</h2>
+            <span>اختر واحداً من هذه الأزرار الواضحة</span>
+          </div>
+        </div>
+
+        <div id="easyOptions" class="easy-grid"></div>
+      </section>
+
+      <section class="advanced">
+        <div class="advanced-header">
+          <h2>كل الجودات المتاحة</h2>
+          <span id="formatsCount">0 خيار</span>
+        </div>
+
+        <div id="formatsList" class="formats"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <strong>تنبيه:</strong>
+        استخدم VidDrop فقط مع المحتوى الذي تملك حق تحميله، واحترم حقوق النشر وشروط المنصات.
+      </p>
+    </footer>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const body = document.body;
+      const themeBtn = document.getElementById("themeBtn");
+      const themeIcon = document.getElementById("themeIcon");
+      const themeText = document.getElementById("themeText");
+
+      const urlInput = document.getElementById("urlInput");
+      const analyzeBtn = document.getElementById("analyzeBtn");
+      const errorBox = document.getElementById("errorBox");
+      const loadingBox = document.getElementById("loadingBox");
+      const results = document.getElementById("results");
+
+      const videoThumb = document.getElementById("videoThumb");
+      const videoTitle = document.getElementById("videoTitle");
+      const videoStats = document.getElementById("videoStats");
+      const easyOptions = document.getElementById("easyOptions");
+      const formatsList = document.getElementById("formatsList");
+      const formatsCount = document.getElementById("formatsCount");
+      const toast = document.getElementById("toast");
+
+      let currentVideoUrl = "";
+      let currentTitle = "";
+
+      function applyTheme(theme) {
+        if (theme === "light") {
+          body.classList.add("light");
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "الوضع النهاري";
+        } else {
+          body.classList.remove("light");
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "الوضع الليلي";
+        }
+
+        localStorage.setItem("viddrop-theme", theme);
+      }
+
+      const savedTheme = localStorage.getItem("viddrop-theme") || "dark";
+      applyTheme(savedTheme);
+
+      themeBtn.addEventListener("click", () => {
+        const next = body.classList.contains("light") ? "dark" : "light";
+        applyTheme(next);
+      });
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2600);
+      }
+
+      function showError(message) {
+        errorBox.textContent = message;
+        errorBox.style.display = "block";
+      }
+
+      function hideError() {
+        errorBox.textContent = "";
+        errorBox.style.display = "none";
+      }
+
+      function setLoading(on) {
+        loadingBox.classList.toggle("active", on);
+        analyzeBtn.disabled = on;
+        analyzeBtn.textContent = on ? "جاري التحليل..." : "عرض التحميل";
+      }
+
+      function hideResults() {
+        results.classList.remove("active");
+        results.style.display = "none";
+      }
+
+      function showResults() {
+        results.style.display = "block";
+        void results.offsetHeight;
+        results.classList.add("active");
+      }
+
+      function esc(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function getHeight(format) {
+        const label = String(format.label || "");
+        const match = label.match(/(\d{3,4})p/i);
+        return match ? Number(match[1]) : 0;
+      }
+
+      function isVideo(format) {
+        return format && format.type === "video";
+      }
+
+      function isAudio(format) {
+        return format && format.type === "audio";
+      }
+
+      function getDownloadUrl(format) {
+        return "/api/download?" + new URLSearchParams({
+          url: currentVideoUrl,
+          formatId: format.id,
+          title: currentTitle || "video",
+          ext: String(format.ext || "mp4").toLowerCase()
+        }).toString();
+      }
+
+      function startDownload(format) {
+        if (!format) {
+          showToast("لا يوجد خيار مناسب لهذه الجودة");
+          return;
+        }
+
+        showToast("⬇️ بدأ التحميل...");
+        window.location.href = getDownloadUrl(format);
+      }
+
+      function shortCount(n) {
+        if (!n) return null;
+
+        const num = parseInt(String(n).replace(/,/g, ""), 10);
+
+        if (Number.isNaN(num)) return n;
+        if (num >= 1e9) return `${(num / 1e9).toFixed(1)} مليار مشاهدة`;
+        if (num >= 1e6) return `${(num / 1e6).toFixed(1)} مليون مشاهدة`;
+        if (num >= 1e3) return `${Math.round(num / 1e3)} ألف مشاهدة`;
+
+        return `${num} مشاهدة`;
+      }
+
+      function parseDate(value) {
+        if (!value || String(value).length !== 8) return null;
+
+        const year = Number(String(value).slice(0, 4));
+        const month = Number(String(value).slice(4, 6)) - 1;
+        const day = Number(String(value).slice(6, 8));
+
+        return new Date(year, month, day).toLocaleDateString("ar", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+      }
+
+      function renderMeta(data) {
+        videoThumb.src = data.thumbnail || "";
+        videoThumb.alt = data.title || "صورة الفيديو";
+        videoTitle.textContent = data.title || "فيديو بدون عنوان";
+
+        const stats = [];
+
+        if (data.duration && data.duration !== "N/A") {
+          stats.push(`⏱ ${data.duration}`);
+        }
+
+        if (data.uploader) {
+          stats.push(`👤 ${data.uploader}`);
+        }
+
+        if (data.viewCount) {
+          stats.push(`👁 ${shortCount(data.viewCount)}`);
+        }
+
+        if (data.uploadDate) {
+          const d = parseDate(data.uploadDate);
+          if (d) stats.push(`📅 ${d}`);
+        }
+
+        if (data.extractor) {
+          stats.push(`🌐 ${data.extractor}`);
+        }
+
+        videoStats.innerHTML = stats
+          .map(item => `<span class="stat">${esc(item)}</span>`)
+          .join("");
+      }
+
+      function chooseEasyOptions(formats) {
+        const videos = formats
+          .filter(isVideo)
+          .slice()
+          .sort((a, b) => getHeight(b) - getHeight(a));
+
+        const audios = formats.filter(isAudio);
+
+        const high = videos[0] || null;
+
+        let medium =
+          videos.find(f => getHeight(f) <= 720 && getHeight(f) >= 480) ||
+          videos[Math.floor(videos.length / 2)] ||
+          high;
+
+        let low =
+          videos.find(f => getHeight(f) <= 480) ||
+          videos[videos.length - 1] ||
+          medium ||
+          high;
+
+        const audio = audios[0] || null;
+
+        return { high, medium, low, audio };
+      }
+
+      function renderEasyOptions(formats) {
+        const { high, medium, low, audio } = chooseEasyOptions(formats);
+
+        const cards = [
+          {
+            key: "high",
+            icon: "🏆",
+            title: "أعلى جودة",
+            desc: "أفضل خيار إذا بدك أوضح صورة ممكنة.",
+            format: high,
+            recommended: true
+          },
+          {
+            key: "medium",
+            icon: "⚡",
+            title: "جودة متوسطة",
+            desc: "خيار متوازن بين الجودة وسرعة التحميل.",
+            format: medium,
+            recommended: false
+          },
+          {
+            key: "low",
+            icon: "📱",
+            title: "أقل جودة",
+            desc: "مناسب للتحميل السريع أو توفير حجم الملف.",
+            format: low,
+            recommended: false
+          }
+        ];
+
+        if (audio) {
+          cards.push({
+            key: "audio",
+            icon: "🎵",
+            title: "صوت فقط",
+            desc: "مناسب إذا تريد الصوت بدون الفيديو.",
+            format: audio,
+            recommended: false
+          });
+        }
+
+        easyOptions.innerHTML = cards.map(card => {
+          const format = card.format;
+          const label = format ? `${format.label || ""} ${format.ext || ""}`.trim() : "غير متاح";
+          const disabledStyle = format ? "" : "opacity:.45; pointer-events:none;";
+
+          return `
+            <button
+              class="easy-card ${card.recommended ? "recommended" : ""}"
+              data-key="${card.key}"
+              style="${disabledStyle}"
+              type="button"
+            >
+              <div>
+                <div class="easy-icon">${card.icon}</div>
+                <h3>${esc(card.title)}</h3>
+                <p>${esc(card.desc)}</p>
+              </div>
+              <div class="mini">${esc(label)} — اضغط للتحميل</div>
+            </button>
+          `;
+        }).join("");
+
+        easyOptions.querySelectorAll(".easy-card").forEach(button => {
+          button.addEventListener("click", () => {
+            const key = button.dataset.key;
+            const card = cards.find(x => x.key === key);
+            startDownload(card && card.format);
+          });
+        });
+      }
+
+      function renderFormats(formats) {
+        formatsCount.textContent = `${formats.length} خيار`;
+
+        if (!formats.length) {
+          formatsList.innerHTML = `
+            <div style="padding:22px; text-align:center; color:var(--muted); font-weight:800;">
+              لم يتم العثور على جودات قابلة للتحميل.
+            </div>
+          `;
+          return;
+        }
+
+        formatsList.innerHTML = formats.map(format => {
+          const audio = isAudio(format);
+          const icon = audio ? "🎵" : "🎬";
+          const type = audio ? "صوت" : "فيديو";
+          const badgeClass = audio ? "audio" : "video";
+
+          const meta = [];
+
+          if (format.fps) meta.push(`${format.fps}fps`);
+          if (format.abr) meta.push(`${Math.round(format.abr)}kbps`);
+          if (format.size && format.size !== "Unknown") meta.push(format.size);
+
+          const note = String(format.id || "").includes("+")
+            ? "أفضل جودة - دمج صوت وفيديو"
+            : "تحميل سريع";
+
+          meta.push(note);
+
+          return `
+            <div class="format-row">
+              <div class="format-icon">${icon}</div>
+
+              <div class="format-body">
+                <div class="format-name">
+                  ${esc(format.label || "جودة")}
+                  <span class="badge ${badgeClass}">${type}</span>
+                  <span class="badge">${esc(format.ext || "")}</span>
+                </div>
+
+                <div class="format-meta">
+                  ${meta.map(item => `<span>${esc(item)}</span>`).join("<span>·</span>")}
+                </div>
+              </div>
+
+              <button class="btn-download" type="button" data-id="${esc(format.id)}">
+                تحميل
+              </button>
+            </div>
+          `;
+        }).join("");
+
+        formatsList.querySelectorAll(".btn-download").forEach((button, index) => {
+          button.addEventListener("click", () => {
+            startDownload(formats[index]);
+          });
+        });
+      }
+
+      async function analyze() {
+        const url = urlInput.value.trim();
+
+        if (!url) {
+          showError("الرجاء وضع رابط الفيديو أولاً.");
+          urlInput.focus();
+          return;
+        }
+
+        if (!/^https?:\/\//i.test(url)) {
+          showError("الرابط يجب أن يبدأ بـ http:// أو https://");
+          urlInput.focus();
+          return;
+        }
+
+        hideError();
+        hideResults();
+        setLoading(true);
+
+        currentVideoUrl = url;
+
+        try {
+          const response = await fetch("/api/analyze", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ url })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "تعذر تحليل الرابط.");
+          }
+
+          currentTitle = data.title || "video";
+
+          renderMeta(data);
+          renderEasyOptions(data.formats || []);
+          renderFormats(data.formats || []);
+          showResults();
+        } catch (error) {
+          console.error(error);
+          showError(error.message || "حدث خطأ أثناء تحليل الرابط.");
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      analyzeBtn.addEventListener("click", analyze);
+
+      urlInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") analyze();
+      });
+
+      urlInput.addEventListener("input", hideError);
+
+      urlInput.addEventListener("paste", () => {
+        setTimeout(() => {
+          const value = urlInput.value.trim();
+          if (/^https?:\/\//i.test(value)) analyze();
+        }, 120);
+      });
+
+      hideResults();
+      hideError();
+      setLoading(false);
+    })();
+  </script>
+</body>
+</html>

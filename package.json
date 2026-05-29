@@ -1,0 +1,29 @@
+{
+  "name": "viddrop",
+  "version": "1.0.0",
+  "description": "Self-hosted video downloader using yt-dlp and Node.js",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "yt-dlp",
+    "video-downloader",
+    "express",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0"
+  }
+}
