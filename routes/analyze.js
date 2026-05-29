@@ -1,7 +1,14 @@
 const { Router } = require('express');
 const { spawn } = require('child_process');
+const path = require('path');
 
 const router = Router();
+
+const YTDLP_PATH =
+  process.env.YTDLP_PATH ||
+  (process.platform === 'win32'
+    ? 'yt-dlp'
+    : path.join(__dirname, '..', 'bin', 'yt-dlp'));
 
 function formatBytes(bytes) {
   if (!bytes || Number(bytes) <= 0) return 'Unknown';
@@ -61,7 +68,6 @@ function buildFormats(formats) {
   const options = [];
   const seen = new Set();
 
-  // أفضل صوت متاح
   const audioFormats = formats
     .filter(f =>
       f &&
@@ -82,7 +88,6 @@ function buildFormats(formats) {
     audioFormats[0] ||
     null;
 
-  // فيديو فقط - هذا يعطيك 1080p / 720p / 480p...
   const videoOnlyFormats = formats
     .filter(f =>
       f &&
@@ -128,7 +133,6 @@ function buildFormats(formats) {
     });
   }
 
-  // صيغ جاهزة فيها فيديو + صوت بنفس الملف
   const progressiveFormats = formats
     .filter(f =>
       f &&
@@ -175,7 +179,6 @@ function buildFormats(formats) {
     });
   }
 
-  // صوت فقط
   let audioCount = 0;
 
   for (const f of audioFormats) {
@@ -203,7 +206,6 @@ function buildFormats(formats) {
     audioCount++;
   }
 
-  // ترتيب نهائي: الفيديو من الأعلى للأقل، ثم الصوت
   return options.sort((a, b) => {
     if (a.type !== b.type) return a.type === 'video' ? -1 : 1;
 
@@ -232,7 +234,9 @@ router.post('/', (req, res) => {
   let rawOutput = '';
   let rawError = '';
 
-  const ytdlp = spawn('yt-dlp', [
+  console.log(`[analyze] using yt-dlp: ${YTDLP_PATH}`);
+
+  const ytdlp = spawn(YTDLP_PATH, [
     '--dump-json',
     '--no-playlist',
     '--no-warnings',
@@ -290,7 +294,7 @@ router.post('/', (req, res) => {
     console.error('[spawn error]', err);
 
     return res.status(500).json({
-      error: 'yt-dlp binary not found. Please install yt-dlp on the system.'
+      error: `yt-dlp binary not found or cannot run. Path used: ${YTDLP_PATH}`
     });
   });
 });

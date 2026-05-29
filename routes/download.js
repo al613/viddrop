@@ -1,7 +1,14 @@
 const { Router } = require('express');
 const { spawn } = require('child_process');
+const path = require('path');
 
 const router = Router();
+
+const YTDLP_PATH =
+  process.env.YTDLP_PATH ||
+  (process.platform === 'win32'
+    ? 'yt-dlp'
+    : path.join(__dirname, '..', 'bin', 'yt-dlp'));
 
 function sanitiseFormatId(str) {
   return String(str || '').replace(/[^a-zA-Z0-9.\-_+:/\[\]=]/g, '');
@@ -24,7 +31,9 @@ function getDirectUrl({ url, formatId }) {
     let output = '';
     let error = '';
 
-    const ytdlp = spawn('yt-dlp', [
+    console.log(`[download/direct] using yt-dlp: ${YTDLP_PATH}`);
+
+    const ytdlp = spawn(YTDLP_PATH, [
       '--no-playlist',
       '--no-warnings',
       '-f',
@@ -78,12 +87,12 @@ router.get('/', async (req, res) => {
   const filename = `${safeTitle}.${fileExt}`;
 
   console.log(`[download] format="${safeFormatId}" file="${filename}"`);
+  console.log(`[download] using yt-dlp: ${YTDLP_PATH}`);
 
-  /**
+  /*
    * FAST MODE:
-   * إذا formatId لا يحتوي + يعني غالباً ملف واحد جاهز.
+   * إذا formatId لا يحتوي + يعني غالبًا ملف واحد جاهز.
    * نخلي المتصفح يحمل مباشرة من المصدر.
-   * هذا أسرع بكثير من تمريره عبر Node.js.
    */
   if (!safeFormatId.includes('+')) {
     try {
@@ -101,7 +110,7 @@ router.get('/', async (req, res) => {
     }
   }
 
-  /**
+  /*
    * STREAM / MERGE MODE:
    * للجودات المركبة مثل 1080p video + audio.
    */
@@ -111,12 +120,10 @@ router.get('/', async (req, res) => {
     '--no-playlist',
     '--no-warnings',
 
-    // تحسين السرعة للملفات المجزأة
     '-N', '12',
     '--http-chunk-size', '5M',
     '--socket-timeout', '30',
 
-    // دمج الصوت والفيديو
     '--merge-output-format', mergeFormat,
 
     '-f', safeFormatId || 'best',
@@ -124,10 +131,10 @@ router.get('/', async (req, res) => {
     trimmedUrl
   ];
 
-  console.log(`[download] Stream/Merge mode`);
+  console.log('[download] Stream/Merge mode');
   console.log(`[yt-dlp] ${args.join(' ')}`);
 
-  const ytdlp = spawn('yt-dlp', args, {
+  const ytdlp = spawn(YTDLP_PATH, args, {
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
@@ -165,7 +172,7 @@ router.get('/', async (req, res) => {
 
     if (!res.headersSent) {
       res.status(500).json({
-        error: 'yt-dlp binary not found on the system.'
+        error: `yt-dlp binary not found or cannot run. Path used: ${YTDLP_PATH}`
       });
     }
   });
